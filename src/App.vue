@@ -2,6 +2,7 @@
 </script>
 
 <template>
+    <Meshwork />
 </template>
 
 <style scoped>
