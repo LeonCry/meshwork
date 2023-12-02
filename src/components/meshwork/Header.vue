@@ -10,14 +10,14 @@ interface Mark {
 
 type Marks = Record<number, Mark | string>;
 const marks = reactive<Marks>({
-  10: '3年',
+  0: '3年',
   30: '年',
   60: '半年',
   90:'季',
   120:'月',
 });
 const GAP = 30;
-const MARKARR = [10,30,60,90,120];
+const MARKARR = [0,30,60,90,120];
 const MARKLENGTH = MARKARR.length - 1;
 const handleSliderMove = (isAdd:boolean) => {
   const baseIndex = MARKARR.includes(meshwork.sliderValue) ? MARKARR.indexOf(meshwork.sliderValue) : Math.ceil(meshwork.sliderValue / GAP);
@@ -29,7 +29,7 @@ const handleSliderMove = (isAdd:boolean) => {
 <template>
   <div class="mt-52 w-full py-5 flex justify-center border bg-green-50">
     <ElButton class="!text-xl" @click="handleSliderMove(false)">-</ElButton>
-    <ElSlider class="!w-80 px-4" v-model="meshwork.sliderValue" :marks="marks" :min="10" :max="120" :show-tooltip="false"/>
+    <ElSlider class="!w-80 px-4" v-model="meshwork.sliderValue" :marks="marks" :min="0" :max="120" :show-tooltip="true"/>
     <ElButton class="!text-xl" @click="handleSliderMove(true)">+</ElButton>
   </div>
 </template>

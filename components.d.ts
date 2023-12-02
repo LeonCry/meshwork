@@ -8,7 +8,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     ElButton: typeof import('element-plus/es')['ElButton']
-    ElSider: typeof import('element-plus/es')['ElSider']
     ElSlider: typeof import('element-plus/es')['ElSlider']
     Header: typeof import('./src/components/meshwork/Header.vue')['default']
     Meshwork: typeof import('./src/components/meshwork/Meshwork.vue')['default']
