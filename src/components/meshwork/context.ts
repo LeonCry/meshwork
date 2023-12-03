@@ -42,6 +42,8 @@ export const useMeshWorkStore = defineStore("meshwork", () => {
     //需要展示的每个块的文本信息
     const upText = ref<string[]>([]);
     const downText = ref<string[]>([]);
+    //每一天的宽度，用来同步图中的位移
+    const dayWidth = ref(0);
 
     //up down文本的显示
     const blockShowText = (isUpYear:boolean,gap:number) => {
@@ -54,7 +56,7 @@ export const useMeshWorkStore = defineStore("meshwork", () => {
         }
         else {
             upText = Array.from({length:MAXYEARS * 12},(_,i)=> dayjs(STARTTIME).month(i).format("YYYY年M月"));
-            downText = Array.from({length:ALLDAYS / gap },(_,i)=>dayjs(STARTTIME).day(i*gap + 1).format("D日"));
+            downText = Array.from({length:Math.ceil(ALLDAYS / gap) },(_,i)=>dayjs(STARTTIME).day(i*gap + 1).format("D日"));
         }
         return [upText,downText];
     }
@@ -102,19 +104,25 @@ export const useMeshWorkStore = defineStore("meshwork", () => {
             const grap = 12 / gap;
             return upBlockWidth[Math.floor(i / grap)] / grap;
         });
-        return [upBlockWidth,downBlockWidth,totalWidth];
+        return [upBlockWidth,downBlockWidth,dayWidth,totalWidth];
     }
-    //上月下年时的宽度
+    //上月下日时的宽度
     const handleWidthMonthDayCompose = (gap:number) => {
-        const roughMonthDay = 31;
-        const totalWidth =  ALLDAYS * baseWidth.value / (gap * roughMonthDay);
+        const roughMonthDay = 30;
+        const totalWidth =  ALLDAYS * Math.floor(baseWidth.value / (gap * roughMonthDay));
         const dayWidth = totalWidth / ALLDAYS;
         const upBlockWidth = upText.value.map((_,i) => dayWidth * YEARMONTHLYDAY[Math.floor(i/12)][i%12]);
-        const downBlockWidth = downText.value.map(()=>{
-            if (gap % 1 != 0 ) gap = Math.ceil(gap);
+        const downBlockWidth = downText.value.map((_,i)=>{
+            gap = Math.ceil(gap);
+            //如果是所有块中的最后一个，由于其可能代表的并不是gap天
+            //比如gap=6,前面显示1,7，中间是差6天，所以width是6*dayWidth
+            //但是到最后一个是28，后面就没有了，所以只代表4天
+            if (i === downText.value.length - 1) {
+                return totalWidth - (gap * dayWidth)*(i);
+            }
             return gap * dayWidth;
         });
-        return [upBlockWidth,downBlockWidth,totalWidth];
+        return [upBlockWidth,downBlockWidth,dayWidth,totalWidth];
     }
 
     //对sliderValue进行监听
@@ -123,11 +131,11 @@ export const useMeshWorkStore = defineStore("meshwork", () => {
         [upText.value,downText.value] = getBlockText(slider,gap);
         //更新宽度:上年下月的情况
         if ( slider >= 0 && slider < 60 ) {
-            [upWidth.value,downWidth.value,totalWidth.value] = handleWidthYearMonthCompose(slider,gap) as [number[],number[],number];
+            [upWidth.value,downWidth.value,dayWidth.value,totalWidth.value] = handleWidthYearMonthCompose(slider,gap) as [number[],number[],number,number];
         }
         //更新宽度:上月下天的情况
         else {
-            [upWidth.value,downWidth.value,totalWidth.value] = handleWidthMonthDayCompose(gap) as [number[],number[],number];
+            [upWidth.value,downWidth.value,dayWidth.value,totalWidth.value] = handleWidthMonthDayCompose(gap) as [number[],number[],number,number];
         }
 
     },{immediate:true});
@@ -146,5 +154,6 @@ export const useMeshWorkStore = defineStore("meshwork", () => {
         upWidth,
         downWidth,
         totalWidth,
+        dayWidth,
     }
 })

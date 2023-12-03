@@ -2,10 +2,8 @@
 import { useMeshWorkStore } from "./context.ts";
 import {storeToRefs} from "pinia";
 const meshwork = useMeshWorkStore();
-const { upText,downText,upWidth,downWidth,totalWidth } = storeToRefs(meshwork);
-setTimeout(()=>{
-  console.log(upWidth.value,downWidth.value,totalWidth.value);
-},2000)
+const { upText,downText,upWidth,downWidth,totalWidth,dayWidth } = storeToRefs(meshwork);
+console.log(dayWidth);
 </script>
 
 <template>
